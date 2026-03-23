@@ -1,0 +1,202 @@
+%% CALIBRATION CURVE FOR WIND TUNNEL FAN SPEED VS. AIR VELOCITY
+air_velocity = [8.06 13.33 18.62 23.92 29.37 35.09 40.32 45.71]; %INSERT DATA
+RPM = [523 891 1239 1574 1915 2263 2590 2912]; %INSERT DATA
+
+% Script for the linear fit of data. The independent values are
+% in the x array and the matched dependent values are in the y array. This
+% script does not use MATLAB's built-in fitting functions, but uses the
+% formulas from the videos/class notes.
+% You also need to enter the confidence level, typically 95%. The values
+% that are calculated and displayed are:
+% 1. Beta_hat_1 (the best-fit slope)
+% 2. Beta_hat_0 (the best-fit y-intercept)
+% 3. The Root Mean Square Residual, Se
+% 4. The Standard Error for beta0, Sbeta0
+% 5. The Standard Error for beta1, Sbeta1
+% 6. The confidence intervals for beta1 and beta0.
+% After calculating these quantities, the script plots the original data,
+% the best fit line, and the upper and lower bounds for the confidence
+% interval on the best fit line.
+
+x = RPM; % Uncomment and add your own data
+y = air_velocity; % Uncomment and add your own data
+confLev = 0.95; % The confidence level
+N = length(y); % The number of data points
+xbar = mean(x);
+ybar = mean(y);
+Sxx = dot((x-xbar),(x-xbar));
+%Sxx = (x-xbar)*transpose(x-xbar);
+
+% beta1 is the estimated best slope of the best-fit line
+beta1 = dot((x-xbar),(y-ybar))/Sxx;
+% beta1 = ((x-xbar)*transpose(y-ybar))/Sxx
+% beta0 is the estimated best-fit y-intercept of the best fit line
+beta0 = ybar - beta1*xbar;
+yfit = beta0 + beta1*x;
+
+SSE = dot((y - yfit),(y - yfit)); % Sum of the squared residuals
+% SSE = (y - yfit)*transpose(y - yfit) % Sum of the squared residuals
+Se = sqrt(SSE/(N-2)); % The Root Mean Square Residual
+Sbeta0 = Se*sqrt(1/N + xbar^2/Sxx);
+Sbeta1 = Se/sqrt(Sxx);
+
+% tinv defaults to 1-sided test. We need 2-sises, hence:(1-0.5*(1-confLev))
+StdT = tinv((1-0.5*(1-confLev)),N-2); % The Student's t factor
+lambdaBeta1 = StdT*Sbeta1; % The 1/2 confidence interval on beta1
+lambdaBeta0 = StdT*Sbeta0; % The 1/2 confidence interval on beta0
+range = max(x) - min(x);
+xplot = min(x):range/30:max(x); % Generate array for plotting
+yplot = beta0 + beta1*xplot; % Generate array for plotting
+Syhat = Se*sqrt(1/N + (xplot - xbar).*(xplot - xbar)/Sxx);
+lambdayhat = StdT*Syhat;
+Sy = Se*sqrt(1+1/N + (xplot - xbar).*(xplot - xbar)/Sxx);
+lambday = StdT*Sy;
+figure()
+plot(x,y,'x')
+hold on
+plot(xplot,yplot)
+plot(xplot,yplot+lambdayhat,'-.b',xplot,yplot-lambdayhat,'-.b')
+plot(xplot,yplot+lambday,'--m',xplot,yplot-lambday,'--m')
+xlabel('Wind Tunnel Fan Speed [rpm]')
+ylabel('Air Velocity [m/s]')
+title('Calibration Curve for Wind Tunnel Fan Speed vs. Air Velocity')
+if beta1 > 0 % Fix this
+    location = 'northwest';
+else
+    location = 'northeast';
+end
+legend('Data Points','Best Fit Line','Upper Func. Bound',...
+    'Lower Func. Bound', 'Upper Obs. Bound', 'Lower Obs. Bound',...
+    'Location', location)
+hold off
+
+%% DRAG FORCES ON CYLINDRICAL OBJECTS
+reynolds_measured1 = [24849.44742 34445.10621 43577.52631 51551.84965 60452.65039 69915.95526 78254.25187 87155.05261 94963.93356]; %INSERT DATA
+reynolds_measured2 = [25775.92482 35139.96426 43577.52631 52015.08835 61246.77387 70610.81331 78552.04818 87949.17610 97445.56945];
+reynolds_measured3 = [24849.44742 34445.10621 42485.60651 52908.47727 59658.52690 70610.81331 79147.64079 87155.05261 96452.91509];
+reynolds_simulated1 = [16544.23930 49632.71789 82721.19648 115809.67507 148898.15366]; 
+reynolds_simulated2 = [16544.23930 49632.71789 82721.19648 115809.67507 148898.15366];
+reynolds_simulated3 = [16544.23930 49632.71789 82721.19648 115809.67507 148898.15366];
+
+% measured/simulated force values
+nose1_measured_F = [-0.02941995 -0.02941995 0.16671305 0.3530394 0.4707192 0.588399 0.7060788 0.85317855 0.97085835];
+nose1_simulated_F = [0.022175 0.19861 0.55117 1.0799 1.7847];
+nose2_measured_F = [-0.0098067 0.0000000 0.0882598 0.1569064 0.1863264 0.2255530 0.2843929 0.3138128 0.3824594];
+nose2_simulated_F = [0.016 0.147 0.409 0.800 1.323];
+nose3_measured_F = [0.0196133 0.0196133 0.1176798 0.1765197 0.2157463 0.26477955 0.3334261 0.3530394 0.4118793];
+nose3_simulated_F = [0.011582 0.10325 0.28628 0.56065 0.92643];
+
+% measured/simulated coefficient values
+nose1_measured_c = [-0.4624197728 -0.2406660394 0.8520643338 1.289325611 1.250141459 1.168280887 1.119090532 1.090141133 1.04488];
+nose1_simulated_c = [0.6949929084 0.6916324266 0.6909749562 0.6907234584 0.6905528936];
+nose2_measured_c = [-0.1432584 0.0000000 0.4510929 0.5628723 0.4820985 0.4390703 0.4473337 0.3937631 0.3909210];
+nose2_simulated_c = [0.516 0.513 0.512 0.512 0.512];
+nose3_measured_c = [0.3082798485 0.1604440263 0.6327704852 0.6120270157 0.5883371097 0.5154303047 0.5165966454 0.4510928826 0.4297018144];
+nose3_simulated_c = [0.3629947177 0.3595541415 0.3588952781 0.3586018214 0.3584630006];
+
+% Measured and Simulated Drag Force vs. Reynolds number
+figure()
+plot(reynolds_measured1, nose1_measured_F, 'b.', ...
+     reynolds_simulated1, nose1_simulated_F, 'b', ...
+     reynolds_measured2, nose2_measured_F, 'r.', ...
+     reynolds_simulated2, nose2_simulated_F, 'r', ...
+     reynolds_measured3, nose3_measured_F, 'g.', ...
+     reynolds_simulated3, nose3_simulated_F, 'g')
+xlabel('Reynolds Number')
+ylabel('Drag Force [N]')
+title('Measured and Simulated Drag Force vs. Reynolds Number')
+legend('Nose 1 Measured', 'Nose 1 Simulated', 'Nose 2 Measured', 'Nose 2 Simulated', 'Nose 3 Measured', 'Nose 3 Simulated')
+
+% Measured and Simulated Drag Force vs. Reynolds number
+figure()
+plot(reynolds_measured1, nose1_measured_c, 'bo', ...
+     reynolds_simulated1, nose1_simulated_c, 'b', ...
+     reynolds_measured2, nose2_measured_c, 'ro', ...
+     reynolds_simulated2, nose2_simulated_c, 'r', ...
+     reynolds_measured3, nose3_measured_c, 'go', ...
+     reynolds_simulated3, nose3_simulated_c, 'g')
+xlabel('Reynolds Number')
+ylabel('Drag Force [N]')
+title('Measured and Simulated Coefficient of Drag vs. Reynolds Number')
+legend('Nose 1 Measured', 'Nose 1 Simulated', 'Nose 2 Measured', 'Nose 2 Simulated', 'Nose 3 Measured', 'Nose 3 Simulated')
+
+%% PLOTS OF DRAG FORCES ON SCALE ROBOT MODEL
+reynolds_num = [47994.8 62843.0 79108.2 95989.5 113302.2 130799.6 147927.4 162775.6 181443.7];
+simulated_drag_force = [0.2454 0.41501 0.65155 0.9443 1.3012 1.716 2.1742 2.6132 3.2179];
+measured_drag_force = [0.06864655 0.0980665 0.1372931 0.22555295 0.3334261 0.48052585 0.57859235 0.7256921 0.8237586];
+simulated_drag_coefficient = [1.126087666 1.11078697 1.100500541 1.083297253 1.071403732 1.060205014 1.050238005 1.042508445 1.033176464];
+measured_drag_coefficient = [1.200616153 1.000416195 0.8838509753 0.9862204112 1.046397072 1.131558859 1.065243147 1.103436004 1.008067806];
+
+figure()
+plot(reynolds_num, simulated_drag_force, '--k', ...
+     reynolds_num, measured_drag_force, '.k');
+xlabel('Reynolds Number')
+ylabel('Drag Force [N]')
+title('Measured and Simulated Drag Force vs. Reynolds Number')
+legend('Simulated Drag Force', 'Measured Drag Force')
+
+figure()
+plot(reynolds_num, simulated_drag_coefficient, '--k', ...
+     reynolds_num, measured_drag_coefficient, 'ok');
+xlabel('Reynolds Number')
+ylabel('Drag Force [N]')
+title('Measured and Simulated Coefficient of Drag vs. Reynolds Number')
+legend('Simulated Drag Coefficient', 'Measured Drag Coefficient')
+
+
+%% PLOTTING FOR WING
+reynolds_wing_num = [3.18e4 9.55e4 1.59e5 2.23e5 2.87e5];
+
+plate_force_5 = [0.054033 0.48627 1.3511 2.6484 4.3786];
+plate_force_15 = [0.16307 1.4674 4.076 7.989 13.206];
+plate_force_45 = [0.32196 2.8969 8.0468 15.771 26.071];
+plate_coefficient_5 = [0.1108369231 0.1108307692 0.1108594872 0.1108697017 0.1108857233];
+plate_coefficient_15 = [0.3345025641 0.3344501425 0.3344410256 0.3344427002 0.3344349478];
+plate_coefficient_45 = [0.6604307692 0.6602621083 0.6602502564 0.6602197802 0.6602342513];
+
+NACA_force_5 = [0.048603 0.43765 1.2162 2.3844 3.9412];
+NACA_force_15 = [0.16794 1.5100 4.1935 8.2175 13.585];
+NACA_force_45 = [0.33868 3.0448 8.4568 16.576 27.400];
+NACA_coefficient_5 = [0.09969846154 0.09974928775 0.09979076923 0.09981789639 0.09980880025];
+NACA_coefficient_15 = [0.3444923077 0.3441595442 0.3440820513 0.3440083726 0.3440329218];
+NACA_coefficient_45 = [0.6947282051 0.69397151 0.6938912821 0.6939194139 0.6938904717];
+
+%Forces with all angles (plate and wing)
+figure()
+plot(reynolds_wing_num, plate_force_5, 'r--', ...
+     reynolds_wing_num, plate_force_15, 'r-.', ...
+     reynolds_wing_num, plate_force_45, 'r', ...
+     reynolds_wing_num, NACA_force_5, ' b--', ...
+     reynolds_wing_num, NACA_force_15, 'b-.', ...
+     reynolds_wing_num, NACA_force_45, 'b', ...
+     reynolds_wing_num, plate_force_5, 'ro', ...
+     reynolds_wing_num, plate_force_15, 'ro', ...
+     reynolds_wing_num, plate_force_45, 'ro', ...
+     reynolds_wing_num, NACA_force_5, ' bo', ...
+     reynolds_wing_num, NACA_force_15, 'bo', ...
+     reynolds_wing_num, NACA_force_45, 'bo')
+xlabel('Reynolds Number')
+ylabel('Lift Force [N]')
+title('Lift Force vs. Reynolds Number')
+legend('Flat Plate at 5 Degree', 'Flat Plate at 15 Degree', 'Flat Plate at 45 Degree', ...
+       'NACA at 5 Degree', 'NACA at 15 Degree', 'NACA at 45 Degree')
+
+%Coefficient with all angles (plate and wing)
+figure()
+plot(reynolds_wing_num, plate_coefficient_5, 'r--', ...
+     reynolds_wing_num, plate_coefficient_15, 'r-.', ...
+     reynolds_wing_num, plate_coefficient_45, 'r', ...
+     reynolds_wing_num, NACA_coefficient_5, ' b--', ...
+     reynolds_wing_num, NACA_coefficient_15, 'b-.', ...
+     reynolds_wing_num, NACA_coefficient_45, 'b', ...
+     reynolds_wing_num, plate_coefficient_5, 'ro', ...
+     reynolds_wing_num, plate_coefficient_15, 'ro', ...
+     reynolds_wing_num, plate_coefficient_45, 'ro', ...
+     reynolds_wing_num, NACA_coefficient_5, ' bo', ...
+     reynolds_wing_num, NACA_coefficient_15, 'bo', ...
+     reynolds_wing_num, NACA_coefficient_45, 'bo')
+xlabel('Reynolds Number')
+ylabel('Coefficient of Lift')
+title('Coefficient of Lift vs. Reynolds Number')
+legend('Flat Plate at 5 Degree', 'Flat Plate at 15 Degree', 'Flat Plate at 45 Degree', ...
+       'NACA at 5 Degree', 'NACA at 15 Degree', 'NACA at 45 Degree')
