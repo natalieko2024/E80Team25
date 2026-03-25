@@ -79,6 +79,10 @@ String SensorIMU::printRollPitchHeading(void) {
   printString += " heading: ";
   printString += String(state.heading);
   printString += "[deg]";
+  //Uncomment at step 2 of section 2.2
+  //printString += " X magnetometer value: ";
+  //printString += String( state.magX);
+  //printString += "[uTesla]";
   return printString; 
 }
 
