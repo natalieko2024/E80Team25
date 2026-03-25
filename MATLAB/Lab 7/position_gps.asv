@@ -1,0 +1,24 @@
+% only include locked points --> GPS lock LED on
+x_points = [];
+y_points = [];
+
+% photo details:
+% upper left corner: 34.1073466°, -117.7140967°
+% lower right corner: 34.1054596°, -117.7104797°
+% origin: 34.106465°, -117.712488°
+% find map corners
+R_earth = 6371e3;   % in meters
+lat0 = 34.106465*pi/180;
+long0 = -117.712488*pi/180;
+xmin = R_earth*(34.1073466*pi/180 - long0) * cos(lat0);
+ymax = 
+
+% load image
+img = imread('campus_image.png');
+figure()
+image(img);
+
+hold on
+
+% plot walking
+plot(x_points, y_points, 'r.', 'MarkerSize', 10)
