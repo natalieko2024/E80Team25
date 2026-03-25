@@ -41,6 +41,8 @@ public:
   float uR = uR; // *Kr;              // right motor effort
   float uL = uL; // *Kl;              // left motor effort
 
+  // uR and uL bounds
+
   // if (uR > 127) uR = 127; //uR control values
   // if (uR < 0) uR = 0;
 
