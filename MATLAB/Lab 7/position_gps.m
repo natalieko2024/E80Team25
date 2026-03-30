@@ -1,0 +1,32 @@
+% only include locked points --> GPS lock LED on
+x_points = [30 46];
+y_points = [266 474];
+
+% photo details:
+% upper left corner: 34.1073466°, -117.7140967°
+% lower right corner: 34.1054596°, -117.7104797°
+% origin: 34.106465°, -117.712488°
+% find map corners
+R_earth = 6371e3;   % in meters
+lat0 = 34.106465 * pi/180;
+long0 = -117.712488 * pi/180;
+xmin = R_earth * (-117.7140967 * pi/180 - long0) * cos(lat0);
+ymin = R_earth * (34.1073466 * pi/180 - lat0);
+xmax = R_earth * (-117.7104797 * pi/180 - long0) * cos(lat0);
+ymax = R_earth * (34.1054596 * pi/180 - lat0);
+
+% load image
+img = imread('campus_image.png');
+figure()
+image([xmin xmax], [ymin ymax], img);
+% lat increases as you go up where index increases as you go down for img
+% so you have to reverse back to normal
+set(gca, 'YDir', 'normal')
+
+hold on
+
+% plot walking
+plot(x_points, y_points, 'r.', 'MarkerSize', 10)
+
+% test origin
+% plot(0, 0, 'b.', 'MarkerSize', 12, 'LineWidth', 2)
