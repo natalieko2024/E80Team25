@@ -2,6 +2,9 @@
 
 
 for i = 1:1075
+    yaw(i) = yaw(i)*pi/180
+    yaw_des(i) = yaw_des(i)*pi/180
+    
     if yaw(i) < (-pi)
         yaw(i) = yaw_des(i)+2*pi;
     end
@@ -21,13 +24,13 @@ angleERr = yaw_des-yaw;
 
 time = [1:1075]*0.099;
 
+figure()
+plot(time, angleERr);
+xlabel("Time [s]")
+ylabel("Angle Error [rad]")
 
-plot(angleERr, time);
-xlabel("Angle Error [rad]")
-ylabel("Time [s]")
 
-
-
+figure()
 plot(time, u, 'LineWidth', 1.5);
 xlabel('Time (s)');
 ylabel('Control Effort (u)');
