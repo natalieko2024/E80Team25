@@ -102,7 +102,6 @@ void loop() {
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
     printer.printValue(0,adc.printSample());
-    //printer.printValue(1,button_sampler.printState());
     printer.printValue(1,ef.printStates());
     printer.printValue(2,logger.printState());
     printer.printValue(3,gps.printState());   
