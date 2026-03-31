@@ -16,7 +16,7 @@ positionY = cumtrapz(t, velocityY);
 
 %plotting xy coords
 figure()
-plot([0 0.5], [0 0], 'r')
+plot([0 0.5 0], [0 0 0], 'r')
 hold on
 plot(positionX, positionY, 'b')
 hold on
