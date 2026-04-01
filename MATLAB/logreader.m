@@ -1,10 +1,10 @@
-% logreader.m
+% logreader_func.m
 % Use this script to read data from your micro SD card
 
 clear;
 %clf;
 
-filenum = '022'; % file number for the data you want to read
+filenum = '045'; % file number for the data you want to read
 infofile = strcat('INF', filenum, '.TXT');
 datafile = strcat('LOG', filenum, '.BIN');
 
