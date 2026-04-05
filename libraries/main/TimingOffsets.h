@@ -16,5 +16,6 @@
 #define SURFACE_CONTROL_LOOP_OFFSET 65
 #define LED_LOOP_OFFSET 70
 #define LOGGER_LOOP_OFFSET 75
+#define MMT_LOOP_OFFSET 50 //im guessing
 
 #endif
