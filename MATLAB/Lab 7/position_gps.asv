@@ -1,6 +1,8 @@
 % only include locked points --> GPS lock LED on
-x_points = [];
-y_points = [];
+x_points = -x;
+y_points = y;
+Ex = [125 150 125];
+Ey = [-40 -40 -40];
 
 % photo details:
 % upper left corner: 34.1073466°, -117.7140967°
@@ -8,17 +10,30 @@ y_points = [];
 % origin: 34.106465°, -117.712488°
 % find map corners
 R_earth = 6371e3;   % in meters
-lat0 = 34.106465*pi/180;
-long0 = -117.712488*pi/180;
-xmin = R_earth*(34.1073466*pi/180 - long0) * cos(lat0);
-ymax = 
+lat0 = 34.106465 * pi/180;
+long0 = -117.712488 * pi/180;
+xmin = R_earth * (-117.7140967 * pi/180 - long0) * cos(lat0);
+ymin = R_earth * (34.1073466 * pi/180 - lat0);
+xmax = R_earth * (-117.7104797 * pi/180 - long0) * cos(lat0);
+ymax = R_earth * (34.1054596 * pi/180 - lat0);
 
 % load image
 img = imread('campus_image.png');
 figure()
-image(img);
+image([xmin xmax], [ymin ymax], img);
+% lat increases as you go up where index increases as you go down for img
+% so you have to reverse back to normal
+set(gca, 'YDir', 'normal')
 
 hold on
 
 % plot walking
 plot(x_points, y_points, 'r.', 'MarkerSize', 10)
+xlabel('X Position [m]')
+ylabel('Y Position [m]')
+
+hold on
+plot(Ex,Ey, 'b', 'LineWidth', 5);
+
+% test origin
+% plot(0, 0, 'b.', 'MarkerSize', 12, 'LineWidth', 2)

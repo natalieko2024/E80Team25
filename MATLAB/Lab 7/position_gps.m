@@ -1,6 +1,8 @@
 % only include locked points --> GPS lock LED on
-x_points = [30 46];
-y_points = [266 474];
+x_points = -x;
+y_points = y;
+Ex = [125 150 125];
+Ey = [-40 -40 -40];
 
 % photo details:
 % upper left corner: 34.1073466°, -117.7140967°
@@ -27,6 +29,12 @@ hold on
 
 % plot walking
 plot(x_points, y_points, 'r.', 'MarkerSize', 10)
+xlabel('X Position [m]')
+ylabel('Y Position [m]')
+
+hold on
+plot(Ex,Ey, 'b', 'LineWidth', 3);
+legend('Walking Path', 'Expected Path')
 
 % test origin
 % plot(0, 0, 'b.', 'MarkerSize', 12, 'LineWidth', 2)
