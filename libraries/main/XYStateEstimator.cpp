@@ -32,8 +32,8 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
     ///////////////////////////////////////////////////////////////////
     // INSERT YAW, X and Y CALCULATION HERE
     //////////////////////////////////////////////////////////////////
-    latitudeChange = (gps_state_p->lat-34.106465)*pi/180;
-    longitudeChange = (gps_state_p->lon+117.712488)*pi/180;
+    latitudeChange = (gps_state_p->lat-34.106465)*PI/180;
+    longitudeChange = (gps_state_p->lon+117.712488)*PI/180;
 
     if (latitudeChange > M_PI) {
       latitudeChange -= M_PI;
