@@ -47,8 +47,8 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
       longitudeChange += M_PI;
     }
 
-    state.y = RADIUS_OF_EARTH*latitudeChange;
-    state.x = RADIUS_OF_EARTH*longitudeChange*cos(origin_lat);
+    state.y = RADIUS_OF_EARTH_M*latitudeChange;
+    state.x = RADIUS_OF_EARTH_M*longitudeChange*cos(origin_lat);
     state.yaw = (-imu_state_p->heading + 90)*pi/180;
 
   }
