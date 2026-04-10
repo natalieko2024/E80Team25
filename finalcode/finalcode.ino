@@ -22,6 +22,7 @@ Written for Sp26 Team 25 by Natalie Ko (nko@g.hmc.edu)
 #include <SensorGPS.h>
 #include <SensorIMU.h>
 #include <XYStateEstimator.h>
+#include <ZStateEstimator.h>
 #include <ADCSampler.h>
 #include <ErrorFlagSampler.h>
 #include <ButtonSampler.h> // A template of a data source library
@@ -29,6 +30,7 @@ Written for Sp26 Team 25 by Natalie Ko (nko@g.hmc.edu)
 #include <Logger.h>
 #include <Printer.h>
 #include <SurfaceControl.h>
+#include <DepthControl.h>
 #define UartSerial Serial1
 #include <GPSLockLED.h>
 
@@ -38,7 +40,9 @@ Written for Sp26 Team 25 by Natalie Ko (nko@g.hmc.edu)
 
 MotorDriver motor_driver;
 XYStateEstimator xy_state_estimator;
+ZStateEstimator z_state_estimator;
 SurfaceControl surface_control;
+DepthControl depth_control;
 SensorGPS gps;
 Adafruit_GPS GPS(&UartSerial);
 ADCSampler adc;
@@ -68,7 +72,9 @@ void setup() {
   logger.include(&imu);
   logger.include(&gps);
   logger.include(&xy_state_estimator);
+  logger.include(&z_state_estimator);
   logger.include(&surface_control);
+  logger.include(&depth_control);
   logger.include(&motor_driver);
   logger.include(&adc);
   logger.include(&ef);
@@ -85,14 +91,20 @@ void setup() {
   motor_driver.init();
   led.init();
 
-
   int navigateDelay = 0; // how long robot will stay at surface waypoint before continuing (ms)
+  int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
   const int num_surface_waypoints = 3; // Number of ordered pairs of surface waypoints. (e.g., if surface_waypoints is {x0,y0,x1,y1} then num_surface_waypoints is 2.) Set to 0 if only doing depth control 
+  // TO CHANGE - origin, out, origin
   double surface_waypoints [] = { 125, -40, 150, -40, 125, -40 };   // listed as x0,y0,x1,y1, ... etc.
   surface_control.init(num_surface_waypoints, surface_waypoints, navigateDelay);
   
+  const int num_depth_waypoints = 14;
+  double depth_waypoints [] = { 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3.0, 3.3, 3.6, 3.9, 4.2 };  // listed as z0,z1,... etc.
+  depth_control.init(num_depth_waypoints, depth_waypoints, diveDelay);
+
   xy_state_estimator.init(); 
+  z_state_estimator.init();
 
   mmt.init();
   pinMode(DRDYPin, INPUT_PULLUP); // We want to read
@@ -126,7 +138,9 @@ void setup() {
   ef.lastExecutionTime                 = loopStartTime - LOOP_PERIOD + ERROR_FLAG_LOOP_OFFSET;
   button_sampler.lastExecutionTime     = loopStartTime - LOOP_PERIOD + BUTTON_LOOP_OFFSET;
   xy_state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + XY_STATE_ESTIMATOR_LOOP_OFFSET;
+  z_state_estimator.lastExecutionTime  = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
   surface_control.lastExecutionTime    = loopStartTime - LOOP_PERIOD + SURFACE_CONTROL_LOOP_OFFSET;
+  depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
   mmt.lastExecutionTime                = loopStartTime - LOOP_PERIOD + MMT_LOOP_OFFSET;
 }
@@ -149,10 +163,13 @@ void loop() {
     printer.printValue(4,xy_state_estimator.printState());  
     printer.printValue(5,surface_control.printWaypointUpdate());
     printer.printValue(6,surface_control.printString());
-    printer.printValue(7,motor_driver.printState());
-    printer.printValue(8,imu.printRollPitchHeading());        
-    printer.printValue(9,imu.printAccels());
-    printer.printValue(10, mmt.printValues());
+    printer.printValue(7,z_state_estimator.printState());  
+    printer.printValue(8,depth_control.printWaypointUpdate());
+    printer.printValue(9,depth_control.printString());
+    printer.printValue(10,motor_driver.printState());
+    printer.printValue(11,imu.printRollPitchHeading());        
+    //printer.printValue(12,imu.printAccels());
+    printer.printValue(12,mmt.printValues());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
@@ -170,6 +187,31 @@ void loop() {
         surface_control.atPoint = false;   // get ready to go to the next point
       }
       motor_driver.drive(surface_control.uL,surface_control.uR,0);
+    }
+  }
+
+  /* ROBOT CONTROL Finite State Machine */
+  if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
+    depth_control.lastExecutionTime = currentTime;
+    if ( depth_control.diveState ) {      // DIVE STATE //
+      depth_control.complete = false;
+      if ( !depth_control.atDepth ) {
+        depth_control.dive(&z_state_estimator.state, currentTime);
+      }
+      else {
+        depth_control.diveState = false; 
+        depth_control.surfaceState = true;
+      }
+      motor_driver.drive(0,0,depth_control.uV);
+    }
+    if ( depth_control.surfaceState ) {     // SURFACE STATE //
+      if ( !depth_control.atSurface ) { 
+        depth_control.surface(&z_state_estimator.state);
+      }
+      else if ( depth_control.complete ) { 
+        delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
+      }
+      motor_driver.drive(0,0,depth_control.uV);
     }
   }
   

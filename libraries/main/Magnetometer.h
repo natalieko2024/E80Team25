@@ -3,7 +3,7 @@
 
 // General
 #define MMTAdr 0x20 // Slave address for magnetometer, Pin2 and Pin4 are low
-#define DRDYPin 14 // Data Ready Pin: D14 -> A0, SDA: 17, SCL:16
+#define DRDYPin 24 // Data Ready Pin: 24 -> A10, SDA: 17 A3, SCL:16 A2
 
 // Registers
 #define REVIDReg 0x36 // Address for the Revid internal register

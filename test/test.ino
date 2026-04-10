@@ -4,7 +4,7 @@
 #define RM3100Address 0x20 // Hexadecimal slave address for RM3100 with Pin 2 and Pin 4 set to LOW
 
 //pin definitions
-#define PIN_DRDY 14 //Set pin D9 to be the Data Ready Pin
+#define PIN_DRDY 9 //Set pin D9 to be the Data Ready Pin
 
 //internal register values without the R/W bit
 #define RM3100_REVID_REG 0x36 // Hexadecimal address for the Revid internal register
@@ -23,11 +23,9 @@ uint8_t revid;
 uint16_t cycleCount;
 float gain;
 
-#define WIRE Wire1
-
 void setup() {
   pinMode(PIN_DRDY, INPUT);
-  WIRE.begin(); // Initiate the WIRE library
+  Wire.begin(); // Initiate the Wire library
   Serial.begin(9600); //set baud rate to 9600
   delay(100);
 
@@ -74,24 +72,24 @@ void loop() {
     while((readReg(RM3100_STATUS_REG) & 0x80) != 0x80); //read internal status register
   }
 
-  WIRE.beginTransmission(RM3100Address);
-  WIRE.write(0x24); //request from the first measurement results register
-  WIRE.endTransmission();
+  Wire.beginTransmission(RM3100Address);
+  Wire.write(0x24); //request from the first measurement results register
+  Wire.endTransmission();
 
   // Request 9 bytes from the measurement results registers
-  WIRE.requestFrom(RM3100Address, 9);
-  if(WIRE.available() == 9) {
-    x2 = WIRE.read();
-    x1 = WIRE.read();
-    x0 = WIRE.read();
+  Wire.requestFrom(RM3100Address, 9);
+  if(Wire.available() == 9) {
+    x2 = Wire.read();
+    x1 = Wire.read();
+    x0 = Wire.read();
     
-    y2 = WIRE.read();
-    y1 = WIRE.read();
-    y0 = WIRE.read();
+    y2 = Wire.read();
+    y1 = Wire.read();
+    y0 = Wire.read();
     
-    z2 = WIRE.read();
-    z1 = WIRE.read();
-    z0 = WIRE.read();
+    z2 = Wire.read();
+    z1 = Wire.read();
+    z0 = Wire.read();
   }
 
   //special bit manipulation since there is not a 24 bit signed int data type
@@ -141,26 +139,26 @@ uint8_t readReg(uint8_t addr){
   uint8_t data = 0;
   
   // Enable transmission to specific which register to read from
-  WIRE.beginTransmission(RM3100Address);
-  WIRE.write(addr); //request from the REVID register
-  WIRE.endTransmission();
+  Wire.beginTransmission(RM3100Address);
+  Wire.write(addr); //request from the REVID register
+  Wire.endTransmission();
 
   delay(100);
 
   // Request 1 byte from the register specified earlier
-  WIRE.requestFrom(RM3100Address, 1);
-  if(WIRE.available() == 1) {
-    data = WIRE.read();
+  Wire.requestFrom(RM3100Address, 1);
+  if(Wire.available() == 1) {
+    data = Wire.read();
   }
   return data;
 }
 
 //addr is the 7 bit (No r/w bit) value of the internal register's address, data is 8 bit data being written
 void writeReg(uint8_t addr, uint8_t data){
-  WIRE.beginTransmission(RM3100Address);
-  WIRE.write(addr);
-  WIRE.write(data);
-  WIRE.endTransmission();
+  Wire.beginTransmission(RM3100Address);
+  Wire.write(addr);
+  Wire.write(data);
+  Wire.endTransmission();
 }
 
 //newCC is the new cycle count value (16 bits) to change the data acquisition
@@ -168,13 +166,13 @@ void changeCycleCount(uint16_t newCC){
   uint8_t CCMSB = (newCC & 0xFF00) >> 8; //get the most significant byte
   uint8_t CCLSB = newCC & 0xFF; //get the least significant byte
   
-  WIRE.beginTransmission(RM3100Address);
-  WIRE.write(RM3100_CCX1_REG);
-  WIRE.write(CCMSB);  //write new cycle count to ccx1
-  WIRE.write(CCLSB);  //write new cycle count to ccx0
-  WIRE.write(CCMSB);  //write new cycle count to ccy1
-  WIRE.write(CCLSB);  //write new cycle count to ccy0
-  WIRE.write(CCMSB);  //write new cycle count to ccz1
-  WIRE.write(CCLSB);  //write new cycle count to ccz0     
-  WIRE.endTransmission();  
+  Wire.beginTransmission(RM3100Address);
+  Wire.write(RM3100_CCX1_REG);
+  Wire.write(CCMSB);  //write new cycle count to ccx1
+  Wire.write(CCLSB);  //write new cycle count to ccx0
+  Wire.write(CCMSB);  //write new cycle count to ccy1
+  Wire.write(CCLSB);  //write new cycle count to ccy0
+  Wire.write(CCMSB);  //write new cycle count to ccz1
+  Wire.write(CCLSB);  //write new cycle count to ccz0     
+  Wire.endTransmission();  
 }

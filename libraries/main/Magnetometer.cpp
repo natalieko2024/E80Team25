@@ -5,7 +5,19 @@ extern Printer printer;
 Magnetometer::Magnetometer() : DataSource("MMTmagX,MMTmagY,MMTmagZ,MMTmagTotal", "float,float,float,float") {}
 
 void Magnetometer::init(void) {
-    Serial.print("Initializing magnetometer");
+  Serial.print("Initializing magnetometer");
+
+  // pinMode(DRDYPin, INPUT_PULLUP); // We want to read
+
+  // // Set measurement mode
+  // if (single) {
+  //   // Single measurement mode
+  //   writeReg(CMMReg, 0);
+  //   writeReg(POLLReg, 0x70);
+  // } else {
+  //   //Continuous measurement mode
+  //   writeReg(CMMReg, 0x79);
+  // }
 }
 
 //addr is the 7 bit value of the register's address (without the R/W bit)
