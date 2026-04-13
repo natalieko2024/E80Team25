@@ -191,30 +191,34 @@ void loop() {
     }
   }
 
-  /* ROBOT CONTROL Finite State Machine */
-  if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
-    depth_control.lastExecutionTime = currentTime;
-    if ( depth_control.diveState ) {      // DIVE STATE //
-      depth_control.complete = false;
-      if ( !depth_control.atDepth ) {
-        depth_control.dive(&z_state_estimator.state, currentTime);
+  // if doDepth, start doing depth control
+  if (surface_control.doDepth == true) {
+    /* ROBOT CONTROL Finite State Machine */
+    if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
+      depth_control.lastExecutionTime = currentTime;
+      if ( depth_control.diveState ) {      // DIVE STATE //
+        depth_control.complete = false;
+        if ( !depth_control.atDepth ) {
+          depth_control.dive(&z_state_estimator.state, currentTime);
+        }
+        else {
+          depth_control.diveState = false; 
+          depth_control.surfaceState = true;
+        }
+        motor_driver.drive(0,0,depth_control.uV);
       }
-      else {
-        depth_control.diveState = false; 
-        depth_control.surfaceState = true;
+      if ( depth_control.surfaceState ) {     // SURFACE STATE //
+        if ( !depth_control.atSurface ) { 
+          depth_control.surface(&z_state_estimator.state);
+        }
+        else if ( depth_control.complete ) { 
+          delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
+        }
+        motor_driver.drive(0,0,depth_control.uV);
       }
-      motor_driver.drive(0,0,depth_control.uV);
-    }
-    if ( depth_control.surfaceState ) {     // SURFACE STATE //
-      if ( !depth_control.atSurface ) { 
-        depth_control.surface(&z_state_estimator.state);
-      }
-      else if ( depth_control.complete ) { 
-        delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
-      }
-      motor_driver.drive(0,0,depth_control.uV);
     }
   }
+  
   
   if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
     adc.lastExecutionTime = currentTime;

@@ -20,8 +20,15 @@ void SurfaceControl::init(const int totalWayPoints_in, double * wayPoints_in, in
     wayPoints[i] = wayPoints_in[i];
   }
   navigateDelay = navigateDelay_in;
-  if (totalWayPoints == 0) atPoint = 1; // not doing surface control
-  else atPoint = 0; // doing surface control
+
+  if (totalWayPoints == 1) {
+    atPoint = 1; // not doing surface control
+    doDepth = 1; // start doing depth control
+  } else if (totalWayPoints == 0) {
+    atPoint = 1; // not doing surface control
+  } else {
+    atPoint = 0; // doing surface control
+  }
 }
 
 int SurfaceControl::getWayPoint(int dim) {

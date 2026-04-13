@@ -53,6 +53,7 @@ public:
 
   bool navigateState = 1;
   bool atPoint;
+  bool doDepth;
   bool complete = 0;
 
   int totalWayPoints;
