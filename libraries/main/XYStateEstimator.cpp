@@ -32,8 +32,8 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
     ///////////////////////////////////////////////////////////////////
     // INSERT YAW, X and Y CALCULATION HERE
     //////////////////////////////////////////////////////////////////
-    float latitudeChange = (gps_state_p->lat-34.106465)*PI/180;
-    float longitudeChange = (gps_state_p->lon+117.712488)*PI/180;
+    float latitudeChange = (gps_state_p->lat-origin_lat)*(M_PI/180.0);
+    float longitudeChange = (gps_state_p->lon-origin_lon)*(M_PI/180.0);
 
     if (latitudeChange > M_PI) {
       latitudeChange -= M_PI;
@@ -48,12 +48,18 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
     }
 
     state.y = RADIUS_OF_EARTH_M*latitudeChange;
-    state.x = RADIUS_OF_EARTH_M*longitudeChange*cos(origin_lat);
-    state.yaw = (-imu_state_p->heading + 90)*PI/180;
+    state.x = RADIUS_OF_EARTH_M*longitudeChange*cos(origin_lat*M_PI/180.0);
+    state.yaw = (-imu_state_p->heading + 90)*M_PI/180.0;
 
   }
   else{
     gpsAcquired = 0;
+    // String latlon = "";
+    // latlon += "Latitude: ";
+    // latlon += String(gps_state_p->lat);
+    // latlon += "Longitude: ";
+    // latlon += String(gps_state_p->lon);
+    // return latlon;
   }
 }
 

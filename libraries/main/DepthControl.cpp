@@ -26,6 +26,17 @@ void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, cons
   diveDelay = diveDelay_in;
 }
 
+// void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, int diveDelay_in) {
+//   totalWayPoints = totalWayPoints_in;
+//   // create wayPoints array on the Heap so that it isn't erased once the main Arduino loop starts
+//   wayPoints = new double[totalWayPoints];
+//   for (int i=0; i<totalWayPoints; i++) {
+//     wayPoints[i] = wayPoints_in[i];
+//   }
+
+//   diveDelay = diveDelay_in;
+// }
+
 void DepthControl::dive(z_state_t * state, int currentTime_in) {
   currentTime = currentTime_in;
 

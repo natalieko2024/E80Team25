@@ -1,5 +1,6 @@
 #include "SurfaceControl.h"
 #include "Printer.h"
+#include <iostream>
 extern Printer printer;
 
 inline float angleDiff(float a) {
@@ -151,7 +152,18 @@ void SurfaceControl::updatePoint(float x, float y) {
 
   float x_des = getWayPoint(0);
   float y_des = getWayPoint(1);
+
+  // String xy = "";
+  // xy += "x, x_des";
+  // xy += String(x);
+  // xy += String(x_des);
+  // xy += "y, y_des";
+  // xy += String(y);
+  // xy += String (y_des);
+  
   dist = sqrt(pow(x-x_des,2) + pow(y-y_des,2));
+
+  std::cout << "X:" << x << "Y:" << y << "X_des:" << x_des << "Y_des:" << y_des; 
 
   if ((dist < SUCCESS_RADIUS && currentWayPoint < totalWayPoints) || delayed) {
     String changingWPMessage = "";
@@ -181,6 +193,7 @@ void SurfaceControl::updatePoint(float x, float y) {
     }
     printer.printMessage(changingWPMessage,cwpmTime);
   }
+  // return xy;
 }
 
 size_t SurfaceControl::writeDataBytes(unsigned char * buffer, size_t idx) {
