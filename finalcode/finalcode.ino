@@ -102,7 +102,8 @@ void setup() {
 
   const int num_depth_waypoints = 10;
   double depth_waypoints [] = { 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5 };  // listed as z0,z1,... etc.
-  depth_control.init(num_depth_waypoints, depth_waypoints, diveDelay);
+  const int num_depths_check = 20;
+  depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
 
   xy_state_estimator.init(); 
   z_state_estimator.init();
@@ -199,6 +200,7 @@ void loop() {
       if ( depth_control.diveState ) {      // DIVE STATE //
         depth_control.complete = false;
         if ( !depth_control.atDepth ) {
+          depth_control.checkBottom();
           depth_control.dive(&z_state_estimator.state, currentTime);
         }
         else {

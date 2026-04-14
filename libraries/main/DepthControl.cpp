@@ -7,13 +7,22 @@ DepthControl::DepthControl(void)
 : DataSource("uV,depth,depth_des","float,float,float"){}
 
 
-void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, int diveDelay_in) {
+void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, const int totalDepths_in, int diveDelay_in) {
   totalWayPoints = totalWayPoints_in;
   // create wayPoints array on the Heap so that it isn't erased once the main Arduino loop starts
   wayPoints = new double[totalWayPoints];
   for (int i=0; i<totalWayPoints; i++) {
     wayPoints[i] = wayPoints_in[i];
   }
+
+  totalDepths = totalDepths_in;
+  // create wayPoints array on the Heap so that it isn't erased once the main Arduino loop starts
+  depths = new double[totalDepths];
+  // fill them all with 2000s (way out of range so won't fail)
+  for (int i=0; i<totalDepths; i++) {
+    depths[i] = 2000;
+  }
+
   diveDelay = diveDelay_in;
 }
 
@@ -140,6 +149,26 @@ void DepthControl::updatePoint(float z) {
       currentWayPoint = 0;
     }
     printer.printMessage(changingWPMessage,cwpmTime);
+  }
+}
+
+void DepthControl::checkBottom() {
+  // Shift each depth left, but if at end, add the new value here
+  for (int i=0; i<totalDepths; i++) {
+    if (i < totalDepths) {
+      depths[i] = depths[i+1];
+    } else {
+      depths[i] = depth;
+    }
+  }
+
+  double* max_val = std::max_element(depths, depths + 10);
+  double* min_val = std::min_element(depths, depths + 10);
+
+  if ((max_val - min_val) < 5) {
+    atDepth = 1;
+  } else {
+    atDepth = 0;
   }
 }
 

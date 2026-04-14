@@ -14,7 +14,7 @@ public:
   DepthControl(void);
 
   // defines the waypoints used for Depth Control
-  void init(const int totalWayPoints_in, double * wayPoints_in, int diveDelay_in);
+  void init(const int totalWayPoints_in, double * wayPoints_in, const int totalDepths_in, int diveDelay_in);
 
   // sets the vertical motor effort using P-Control when diving
   void dive(z_state_t * state, int currentTime_in);
@@ -25,6 +25,8 @@ public:
   String printString(void);
 
   String printWaypointUpdate(void);
+
+  void checkBottom();
 
   // from DataSource
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
@@ -46,6 +48,9 @@ public:
 
   int totalWayPoints;
   double * wayPoints;
+
+  int totalDepths;
+  double * depths;
 
 private:
 
