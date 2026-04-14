@@ -37,17 +37,18 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
 
     if (latitudeChange > M_PI) {
       latitudeChange -= M_PI;
-    } else if (latitudeChange < M_PI) {
+    } else if (latitudeChange < -M_PI) {
       latitudeChange += M_PI;
     }
 
     if (longitudeChange > M_PI) {
       longitudeChange -= M_PI;
-    } else if (longitudeChange < M_PI) {
+    } else if (longitudeChange < -M_PI) {
       longitudeChange += M_PI;
     }
 
     state.y = RADIUS_OF_EARTH_M*latitudeChange;
+    // state.y = latitudeChange;
     state.x = RADIUS_OF_EARTH_M*longitudeChange*cos(origin_lat*M_PI/180.0);
     state.yaw = (-imu_state_p->heading + 90)*M_PI/180.0;
 
@@ -65,7 +66,7 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
 
 String XYStateEstimator::printState(void) {
   String currentState = "";
-  int decimals = 2;
+  int decimals = 8;
   if (!gpsAcquired){
     currentState += "XY_State: Waiting to acquire more satellites...";
   }
