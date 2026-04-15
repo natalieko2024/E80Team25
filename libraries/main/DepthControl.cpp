@@ -173,13 +173,11 @@ void DepthControl::checkBottom() {
     }
   }
 
-  double* max_val = std::max_element(depths, depths + 10);
-  double* min_val = std::min_element(depths, depths + 10);
+  double* max_val = std::max_element(depths, depths + totalDepths - 1);
+  double* min_val = std::min_element(depths, depths + totalDepths - 1);
 
   if ((max_val - min_val) < 5) {
     atDepth = 1;
-  } else {
-    atDepth = 0;
   }
 }
 

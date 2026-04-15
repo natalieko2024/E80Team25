@@ -58,12 +58,12 @@ int loopStartTime;
 int currentTime;
 volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 
-// Magnetometer mmt;
+Magnetometer mmt;
 
-// // magnetometer constants
-// uint8_t revid;
-// uint16_t cycleCount;
-// float gain;
+// magnetometer constants
+uint8_t revid;
+uint16_t cycleCount;
+float gain;
 
 ////////////////////////* Setup *////////////////////////////////
 
@@ -95,7 +95,7 @@ void setup() {
 
   const int num_surface_waypoints = 3; // Number of ordered pairs of surface waypoints. (e.g., if surface_waypoints is {x0,y0,x1,y1} then num_surface_waypoints is 2.) Set to 0 if only doing depth control 
   // START, END, START
-  double surface_waypoints [] = { 125, -40, 150, -40, 125, -40 };   // listed as x0,y0,x1,y1, ... etc.
+  double surface_waypoints [] = { 0, 0, 0, 2, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
   surface_control.init(num_surface_waypoints, surface_waypoints, navigateDelay);
 
   int diveDelay = 0; // how long robot will stay at depth waypoint before continuing (ms)
@@ -108,29 +108,29 @@ void setup() {
   xy_state_estimator.init(); 
   z_state_estimator.init();
 
-  // mmt.init();
-  // pinMode(DRDYPin, INPUT_PULLUP); // We want to read
-  // WIRE.begin(); // Start I2C bus
-  // // Confirm this gives 0x22 if not something is wrong
-  // revid = mmt.readReg(REVIDReg);
+  mmt.init();
+  pinMode(DRDYPin, INPUT_PULLUP); // We want to read
+  WIRE.begin(); // Start I2C bus
+  // Confirm this gives 0x22 if not something is wrong
+  revid = mmt.readReg(REVIDReg);
 
-  // // Give CC to register so its right
-  // mmt.changeCycleCount(CC);
-  // cycleCount = mmt.readReg(CCX1Reg);
-  // cycleCount = (cycleCount << 8) | mmt.readReg(CCX0Reg);
+  // Give CC to register so its right
+  mmt.changeCycleCount(CC);
+  cycleCount = mmt.readReg(CCX1Reg);
+  cycleCount = (cycleCount << 8) | mmt.readReg(CCX0Reg);
 
-  // // Gain depends on cycle count apparently -> check this is 75 for Cc=200
-  // gain = (0.3671 * (float)cycleCount) + 1.5;
+  // Gain depends on cycle count apparently -> check this is 75 for Cc=200
+  gain = (0.3671 * (float)cycleCount) + 1.5;
 
-  // // Set measurement mode
-  // if (single) {
-  //   // Single measurement mode
-  //   mmt.writeReg(CMMReg, 0);
-  //   mmt.writeReg(POLLReg, 0x70);
-  // } else {
-  //   //Continuous measurement mode
-  //   mmt.writeReg(CMMReg, 0x79);
-  // }
+  // Set measurement mode
+  if (single) {
+    // Single measurement mode
+    mmt.writeReg(CMMReg, 0);
+    mmt.writeReg(POLLReg, 0x70);
+  } else {
+    //Continuous measurement mode
+    mmt.writeReg(CMMReg, 0x79);
+  }
 
   printer.printMessage("Starting main loop",10);
   loopStartTime = millis();
@@ -144,7 +144,7 @@ void setup() {
   z_state_estimator.lastExecutionTime  = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
   depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
-  // mmt.lastExecutionTime                = loopStartTime - LOOP_PERIOD + MMT_LOOP_OFFSET;
+  mmt.lastExecutionTime                = loopStartTime - LOOP_PERIOD + MMT_LOOP_OFFSET;
 }
 
 
@@ -159,19 +159,19 @@ void loop() {
     printer.lastExecutionTime = currentTime;
     printer.printValue(0,adc.printSample());
     //printer.printValue(1,button_sampler.printState());
-    printer.printValue(1,ef.printStates());
-    printer.printValue(2,logger.printState());
-    printer.printValue(3,gps.printState());   
-    printer.printValue(4,xy_state_estimator.printState());  
-    printer.printValue(5,surface_control.printWaypointUpdate());
-    printer.printValue(6,surface_control.printString());
-    printer.printValue(7,z_state_estimator.printState());  
-    printer.printValue(8,depth_control.printWaypointUpdate());
-    printer.printValue(9,depth_control.printString());
-    printer.printValue(10,motor_driver.printState());
-    printer.printValue(11,imu.printRollPitchHeading());        
-    printer.printValue(12,imu.printAccels());
-    // printer.printValue(13,mmt.printValues());
+    //printer.printValue(1,ef.printStates());
+    printer.printValue(1,logger.printState());
+    printer.printValue(2,gps.printState());   
+    printer.printValue(3,xy_state_estimator.printState());  
+    printer.printValue(4,surface_control.printWaypointUpdate());
+    printer.printValue(5,surface_control.printString());
+    printer.printValue(6,z_state_estimator.printState());  
+    printer.printValue(7,depth_control.printWaypointUpdate());
+    printer.printValue(8,depth_control.printString());
+    printer.printValue(9,motor_driver.printState());
+    printer.printValue(10,imu.printRollPitchHeading());        
+    printer.printValue(11,imu.printAccels());
+    printer.printValue(12,mmt.printValues());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
@@ -200,8 +200,8 @@ void loop() {
       if ( depth_control.diveState ) {      // DIVE STATE //
         depth_control.complete = false;
         if ( !depth_control.atDepth ) {
-          depth_control.checkBottom();
           depth_control.dive(&z_state_estimator.state, currentTime);
+          depth_control.checkBottom();
         }
         else {
           depth_control.diveState = false; 
@@ -275,10 +275,10 @@ void loop() {
     logger.log();
   }
 
-  // if ( currentTime- mmt.lastExecutionTime > LOOP_PERIOD ) {
-  //   mmt.lastExecutionTime = currentTime;
-  //   mmt.measureMMT(gain);
-  // }
+  if ( currentTime- mmt.lastExecutionTime > LOOP_PERIOD ) {
+    mmt.lastExecutionTime = currentTime;
+    mmt.measureMMT(gain);
+  }
 }
 
 void EFA_Detected(void){
