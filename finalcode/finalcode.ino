@@ -95,7 +95,7 @@ void setup() {
 
   const int num_surface_waypoints = 3; // Number of ordered pairs of surface waypoints. (e.g., if surface_waypoints is {x0,y0,x1,y1} then num_surface_waypoints is 2.) Set to 0 if only doing depth control 
   // START, END, START
-  double surface_waypoints [] = { 0, 0, 0, 2, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
+  double surface_waypoints [] = { 0, 0, 0, -5, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
   surface_control.init(num_surface_waypoints, surface_waypoints, navigateDelay);
 
   int diveDelay = 0; // how long robot will stay at depth waypoint before continuing (ms)
@@ -145,6 +145,8 @@ void setup() {
   depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
   mmt.lastExecutionTime                = loopStartTime - LOOP_PERIOD + MMT_LOOP_OFFSET;
+
+  surface_control.doDepth = true;
 }
 
 
@@ -175,22 +177,22 @@ void loop() {
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  /// SURFACE CONTROL FINITE STATE MACHINE///
-  if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
-    surface_control.lastExecutionTime = currentTime;
-    if ( surface_control.navigateState ) { // NAVIGATE STATE //
-      if ( !surface_control.atPoint ) { 
-        surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
-      }
-      else if ( surface_control.complete ) { 
-        delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
-      }
-      else {
-        surface_control.atPoint = false;   // get ready to go to the next point
-      }
-      motor_driver.drive(surface_control.uL,surface_control.uR,0);
-    }
-  }
+  // /// SURFACE CONTROL FINITE STATE MACHINE///
+  // if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
+  //   surface_control.lastExecutionTime = currentTime;
+  //   if ( surface_control.navigateState ) { // NAVIGATE STATE //
+  //     if ( !surface_control.atPoint ) { 
+  //       surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
+  //     }
+  //     else if ( surface_control.complete ) { 
+  //       delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
+  //     }
+  //     else {
+  //       surface_control.atPoint = false;   // get ready to go to the next point
+  //     }
+  //     motor_driver.drive(surface_control.uL,surface_control.uR,-255);
+  //   }
+  // }
 
   // if doDepth, start doing depth control
   if (surface_control.doDepth == true) {

@@ -55,12 +55,7 @@ void XYStateEstimator::updateState(imu_state_t * imu_state_p, gps_state_t * gps_
   }
   else{
     gpsAcquired = 0;
-    // String latlon = "";
-    // latlon += "Latitude: ";
-    // latlon += String(gps_state_p->lat);
-    // latlon += "Longitude: ";
-    // latlon += String(gps_state_p->lon);
-    // return latlon;
+
   }
 }
 

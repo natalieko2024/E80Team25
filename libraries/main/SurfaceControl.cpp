@@ -65,8 +65,10 @@ void SurfaceControl::navigate(xy_state_t * state, gps_state_t * gps_state_p, int
     // P control code
     
     yaw_des = atan2(y_des - state->y, x_des - state->x);
+
+    yaw = state->yaw;
     
-    yaw_error = angleDiff(yaw_des-(PI/180)*(state->yaw));
+    yaw_error = angleDiff(yaw_des-yaw);
 
     u = Kp*yaw_error;
 
@@ -114,6 +116,9 @@ String SurfaceControl::printString(void) {
     printString += "Yaw: ";
     printString += String(yaw*180.0/PI);
     printString += "[deg], ";
+    printString += "Yaw Error: ";
+    printString += String(yaw_error*180.0/PI);
+    printString += "[deg], ";
     printString += "u: ";
     printString += String(u);
     printString += ", u_L: ";
@@ -152,14 +157,6 @@ void SurfaceControl::updatePoint(float x, float y) {
 
   float x_des = getWayPoint(0);
   float y_des = getWayPoint(1);
-
-  // String xy = "";
-  // xy += "x, x_des";
-  // xy += String(x);
-  // xy += String(x_des);
-  // xy += "y, y_des";
-  // xy += String(y);
-  // xy += String (y_des);
   
   dist = sqrt(pow(x-x_des,2) + pow(y-y_des,2));
 
