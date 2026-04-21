@@ -121,6 +121,9 @@ void setup() {
   WIRE.begin(); // Start I2C bus
   // Confirm this gives 0x22 if not something is wrong
   revid = mmt.readReg(REVIDReg);
+  Serial.println(revid);
+
+  delay(1000);
 
   // Give CC to register so its right
   mmt.changeCycleCount(CC);
