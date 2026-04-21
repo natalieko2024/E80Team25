@@ -79,7 +79,7 @@ void setup() {
   logger.include(&adc);
   logger.include(&ef);
   logger.include(&button_sampler);
-  // logger.include(&mmt);
+  logger.include(&mmt);
   logger.init();
 
   printer.init();
@@ -186,21 +186,21 @@ void loop() {
   }
 
   // /// SURFACE CONTROL FINITE STATE MACHINE///
-  // if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
-  //   surface_control.lastExecutionTime = currentTime;
-  //   if ( surface_control.navigateState ) { // NAVIGATE STATE //
-  //     if ( !surface_control.atPoint ) { 
-  //       surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
-  //     }
-  //     else if ( surface_control.complete ) { 
-  //       delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
-  //     }
-  //     else {
-  //       surface_control.atPoint = false;   // get ready to go to the next point
-  //     }
-  //     motor_driver.drive(surface_control.uL,surface_control.uR,-200);
-  //   }
-  // }
+  if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
+    surface_control.lastExecutionTime = currentTime;
+    if ( surface_control.navigateState ) { // NAVIGATE STATE //
+      if ( !surface_control.atPoint ) { 
+        surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
+      }
+      else if ( surface_control.complete ) { 
+        delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
+      }
+      else {
+        surface_control.atPoint = false;   // get ready to go to the next point
+      }
+      motor_driver.drive(surface_control.uL,surface_control.uR,-200);
+    }
+  }
 
   // if doDepth, start doing depth control
   if (surface_control.doDepth == true) {
