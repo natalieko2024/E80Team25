@@ -130,10 +130,10 @@ void Magnetometer::measureMMT(float gain) {
 // Nathan said this was missing(?)
 size_t Magnetometer::writeDataBytes(unsigned char * buffer, size_t idx) {
   float * data_slot = (float *) &buffer[idx];
-  data_slot[0] = state.MMT.MMTmagX;
-  data_slot[1] = state.MMT.MMTmagY;
-  data_slot[2] = state.MMT.MMTmagZ;
-  data_slot[3] = state.MMT.MMTmagTotal;
+  data_slot[0] = stateMMT.MMTmagX;
+  data_slot[1] = stateMMT.MMTmagY;
+  data_slot[2] = stateMMT.MMTmagZ;
+  data_slot[3] = stateMMT.MMTmagTotal;
 
   return idx + 4*sizeof(float);
 }
