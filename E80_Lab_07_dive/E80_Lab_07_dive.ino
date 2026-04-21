@@ -55,7 +55,7 @@ volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 void setup() {
   
   logger.include(&imu);
-  logger.include(&gps);
+  logger.include(&gps);f
   logger.include(&xy_state_estimator);
   logger.include(&z_state_estimator);
   logger.include(&depth_control);
