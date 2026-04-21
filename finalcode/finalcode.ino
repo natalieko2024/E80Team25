@@ -91,6 +91,14 @@ void setup() {
   motor_driver.init();
   led.init();
 
+// track depth is correct, if depth is correct check waypoint tracking is correct
+// motor control effort going down is too high, motor control effort going up is too low?? may change values
+
+// change Kp = 100 or 500 -> that should make it go straight
+// if doesnt work change Kr and Kl to make the efforts of RL motors match
+// change average power?
+// change threshold 0-127 to sm higher
+
   int navigateDelay = 0; // how long robot will stay at surface waypoint before continuing (ms)
 
   const int num_surface_waypoints = 3; // Number of ordered pairs of surface waypoints. (e.g., if surface_waypoints is {x0,y0,x1,y1} then num_surface_waypoints is 2.) Set to 0 if only doing depth control 
@@ -190,7 +198,7 @@ void loop() {
   //     else {
   //       surface_control.atPoint = false;   // get ready to go to the next point
   //     }
-  //     motor_driver.drive(surface_control.uL,surface_control.uR,-255);
+  //     motor_driver.drive(surface_control.uL,surface_control.uR,-200);
   //   }
   // }
 
