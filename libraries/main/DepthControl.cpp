@@ -19,9 +19,10 @@ void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, cons
   // create wayPoints array on the Heap so that it isn't erased once the main Arduino loop starts
   depths = new double[totalDepths];
   // fill them all with 2000s (way out of range so won't fail)
-  for (int i=0; i<totalDepths; i++) {
+  for (int i=0; i<totalDepths - 1; i++) {
     depths[i] = 2000;
   }
+  depths[totalDepths -1] = -2000;
 
   diveDelay = diveDelay_in;
 }
@@ -62,6 +63,7 @@ void DepthControl::dive(z_state_t * state, int currentTime_in) {
     uV = -200;
   }
 
+
   //////////////////////////////////////////////////////////////////////
   
   ///////////////////////////////////////////////////////////////////////
@@ -85,7 +87,7 @@ void DepthControl::surface(z_state_t * state) {
   }
   else { // not at surface yet
     atSurface = 0;
-    uV = -30; // go upward
+    uV = -255; // go upward
   }
   printer.printMessage(surfaceMessage,smTime);
 }
@@ -158,6 +160,7 @@ void DepthControl::updatePoint(float z) {
       uV = 0;
       cwpmTime = 10;
       currentWayPoint = 0;
+      
     }
     printer.printMessage(changingWPMessage,cwpmTime);
   }
@@ -166,17 +169,22 @@ void DepthControl::updatePoint(float z) {
 void DepthControl::checkBottom() {
   // Shift each depth left, but if at end, add the new value here
   for (int i=0; i<totalDepths; i++) {
-    if (i < totalDepths) {
+    if (i < totalDepths - 1) {
       depths[i] = depths[i+1];
     } else {
       depths[i] = depth;
     }
   }
-
   double* max_val = std::max_element(depths, depths + totalDepths - 1);
   double* min_val = std::min_element(depths, depths + totalDepths - 1);
 
-  if ((max_val - min_val) < 5) {
+  String calibrationMessage = "Depth Array max: " + String(*max_val) + "Depth Array min: " + String(*min_val) + "MAX - MIN: " +String(*max_val - *min_val);
+  printer.printMessage(calibrationMessage,20);
+
+
+
+
+  if ((*max_val - *min_val) < .05) {
     atDepth = 1;
   }
 }

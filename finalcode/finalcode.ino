@@ -106,11 +106,11 @@ void setup() {
   double surface_waypoints [] = { 0, 0, 0, -5, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
   surface_control.init(num_surface_waypoints, surface_waypoints, navigateDelay);
 
-  int diveDelay = 0; // how long robot will stay at depth waypoint before continuing (ms)
+  int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
-  const int num_depth_waypoints = 10;
-  double depth_waypoints [] = { 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5 };  // listed as z0,z1,... etc.
-  const int num_depths_check = 20;
+  const int num_depth_waypoints = 6;
+  double depth_waypoints [] = { 0, 0.1, 0.2, 0.3, 0.4, 0.5 };  // listed as z0,z1,... etc.
+  const int num_depths_check = 100;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
 
   xy_state_estimator.init(); 
@@ -188,22 +188,22 @@ void loop() {
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  // /// SURFACE CONTROL FINITE STATE MACHINE///
-  if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
-    surface_control.lastExecutionTime = currentTime;
-    if ( surface_control.navigateState ) { // NAVIGATE STATE //
-      if ( !surface_control.atPoint ) { 
-        surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
-      }
-      else if ( surface_control.complete ) { 
-        delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
-      }
-      else {
-        surface_control.atPoint = false;   // get ready to go to the next point
-      }
-      motor_driver.drive(surface_control.uL,surface_control.uR,-200);
-    }
-  }
+  // // /// SURFACE CONTROL FINITE STATE MACHINE///
+  // if ( currentTime-surface_control.lastExecutionTime > LOOP_PERIOD ) {
+  //   surface_control.lastExecutionTime = currentTime;
+  //   if ( surface_control.navigateState ) { // NAVIGATE STATE //
+  //     if ( !surface_control.atPoint ) { 
+  //       surface_control.navigate(&xy_state_estimator.state, &gps.state, currentTime);
+  //     }
+  //     else if ( surface_control.complete ) { 
+  //       delete[] surface_control.wayPoints; // destroy surface waypoint array from the Heap
+  //     }
+  //     else {
+  //       surface_control.atPoint = false;   // get ready to go to the next point
+  //     }
+  //     motor_driver.drive(surface_control.uL,surface_control.uR,-200);
+  //   }
+  // }
 
   // if doDepth, start doing depth control
   if (surface_control.doDepth == true) {

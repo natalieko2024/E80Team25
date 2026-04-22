@@ -55,7 +55,7 @@ volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 void setup() {
   
   logger.include(&imu);
-  logger.include(&gps);f
+  logger.include(&gps);
   logger.include(&xy_state_estimator);
   logger.include(&z_state_estimator);
   logger.include(&depth_control);
@@ -74,11 +74,11 @@ void setup() {
   motor_driver.init();
   led.init();
 
-  int diveDelay = 0; // how long robot will stay at depth waypoint before continuing (ms)
+  int diveDelay = 7000; // how long robot will stay at depth waypoint before continuing (ms)
 
-  const int num_depth_waypoints = 5;
-  double depth_waypoints [] = { 0, 0.5, 1, 1.5, 2 };  // listed as z0,z1,... etc.
-  const int num_depths_check = 20;
+  const int num_depth_waypoints = 2;
+  double depth_waypoints [] = { 0.8, 0.2 };  // listed as z0,z1,... etc.
+  const int num_depths_check = 100;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
   
   xy_state_estimator.init(); 
@@ -126,6 +126,7 @@ void loop() {
   /* ROBOT CONTROL Finite State Machine */
   if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
     depth_control.lastExecutionTime = currentTime;
+     depth_control.checkBottom();
     if ( depth_control.diveState ) {      // DIVE STATE //
       depth_control.complete = false;
       if ( !depth_control.atDepth ) {
