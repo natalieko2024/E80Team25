@@ -109,8 +109,8 @@ void setup() {
   int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
   const int num_depth_waypoints = 6;
-  double depth_waypoints [] = { 0, 0.1, 0.2, 0.3, 0.4, 0.5 };  // listed as z0,z1,... etc.
-  const int num_depths_check = 100;
+  double depth_waypoints [] = { 0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8 };  // listed as z0,z1,... etc.
+  const int num_depths_check = 1000;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
 
   xy_state_estimator.init(); 
@@ -158,6 +158,9 @@ void setup() {
   mmt.lastExecutionTime                = loopStartTime - LOOP_PERIOD + MMT_LOOP_OFFSET;
 
   surface_control.doDepth = true;
+
+  // I NEED TO CLOSE THE BOX :(
+  delay(10000);
 }
 
 
