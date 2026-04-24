@@ -74,11 +74,11 @@ void setup() {
   motor_driver.init();
   led.init();
 
-  int diveDelay = 7000; // how long robot will stay at depth waypoint before continuing (ms)
+  int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
-  const int num_depth_waypoints = 2;
-  double depth_waypoints [] = { 0.8, 0.2 };  // listed as z0,z1,... etc.
-  const int num_depths_check = 100;
+  const int num_depth_waypoints = 4;
+  double depth_waypoints [] = { 0.5, 1, 1.5, 1.8, 2 };  // listed as z0,z1,... etc.
+  const int num_depths_check = 500;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
   
   xy_state_estimator.init(); 
@@ -95,6 +95,8 @@ void setup() {
   z_state_estimator.lastExecutionTime  = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
   depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
+
+  delay(40000);
 
 }
 
