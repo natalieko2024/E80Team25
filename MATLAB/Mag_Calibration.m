@@ -3,7 +3,7 @@
 % last edited: 10/29/18
 %
 % Instructions:
-% 1. Make sure Mag_Calibration.ino in running of the Teensy
+% 1.    
 % 2. Once this script is run, magnetometer data will be collected
 %    for approximately 50 seconds. During this time the IMU should
 %    be rotated and tilted into as many orientations as possible
