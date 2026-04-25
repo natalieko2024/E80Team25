@@ -76,8 +76,8 @@ void setup() {
 
   int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
-  const int num_depth_waypoints = 4;
-  double depth_waypoints [] = { 0.5, 1, 1.5, 1.8, 2 };  // listed as z0,z1,... etc.
+  const int num_depth_waypoints = 6;
+  double depth_waypoints [] = { 0.5, 1, 1.5, 1.8, 2, 2.2 };  // listed as z0,z1,... etc.
   const int num_depths_check = 500;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
   
@@ -96,7 +96,7 @@ void setup() {
   depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 
-  delay(40000);
+  // delay(40000);
 
 }
 
@@ -128,7 +128,7 @@ void loop() {
   /* ROBOT CONTROL Finite State Machine */
   if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
     depth_control.lastExecutionTime = currentTime;
-     depth_control.checkBottom();
+    depth_control.checkBottom();
     if ( depth_control.diveState ) {      // DIVE STATE //
       depth_control.complete = false;
       if ( !depth_control.atDepth ) {

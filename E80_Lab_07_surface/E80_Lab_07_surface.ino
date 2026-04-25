@@ -74,7 +74,7 @@ void setup() {
   int navigateDelay = 0; // how long robot will stay at surface waypoint before continuing (ms)
 
   const int num_surface_waypoints = 3; // Number of ordered pairs of surface waypoints. (e.g., if surface_waypoints is {x0,y0,x1,y1} then num_surface_waypoints is 2.) Set to 0 if only doing depth control 
-  double surface_waypoints [] = { 125, -40, 150, -40, 125, -40 };   // listed as x0,y0,x1,y1, ... etc.
+  double surface_waypoints [] = { 0, 0, 5, 0, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
   surface_control.init(num_surface_waypoints, surface_waypoints, navigateDelay);
   
   xy_state_estimator.init(); 
@@ -127,7 +127,7 @@ void loop() {
       else {
         surface_control.atPoint = false;   // get ready to go to the next point
       }
-      motor_driver.drive(surface_control.uL,surface_control.uR,0);
+      motor_driver.drive(surface_control.uL,-200,surface_control.uR);
     }
   }
   

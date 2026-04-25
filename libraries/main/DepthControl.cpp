@@ -16,12 +16,13 @@ void DepthControl::init(const int totalWayPoints_in, double * wayPoints_in, cons
   }
 
   totalDepths = totalDepths_in;
-  // create wayPoints array on the Heap so that it isn't erased once the main Arduino loop starts
+  // create depths array on the Heap so that it isn't erased once the main Arduino loop starts
   depths = new double[totalDepths];
   // fill them all with 2000s (way out of range so won't fail)
   for (int i=0; i<totalDepths - 1; i++) {
     depths[i] = 2000;
   }
+  // but make the last one -2000 so it doesnt think it's already done at the start
   depths[totalDepths -1] = -2000;
 
   diveDelay = diveDelay_in;
@@ -175,6 +176,8 @@ void DepthControl::checkBottom() {
       depths[i] = depth;
     }
   }
+
+  // Find max and min
   double* max_val = std::max_element(depths, depths + totalDepths - 1);
   double* min_val = std::min_element(depths, depths + totalDepths - 1);
 
@@ -183,9 +186,10 @@ void DepthControl::checkBottom() {
 
 
 
-
+  // Threshold that works
   if ((*max_val - *min_val) < .05) {
     atDepth = 1;
+    printer.printMessage("AT BOTTOM",1);
   }
 }
 

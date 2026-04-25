@@ -108,9 +108,10 @@ void setup() {
 
   int diveDelay = 5000; // how long robot will stay at depth waypoint before continuing (ms)
 
-  const int num_depth_waypoints = 6;
-  double depth_waypoints [] = { 0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8 };  // listed as z0,z1,... etc.
-  const int num_depths_check = 1000;
+  const int num_depth_waypoints = 8;
+  double depth_waypoints [] = { 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5 };
+  //double depth_waypoints [] = { 0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0 };  // listed as z0,z1,... etc.
+  const int num_depths_check = 250;
   depth_control.init(num_depth_waypoints, depth_waypoints, num_depths_check, diveDelay);
 
   xy_state_estimator.init(); 
@@ -160,7 +161,7 @@ void setup() {
   surface_control.doDepth = true;
 
   // I NEED TO CLOSE THE BOX :(
-  delay(10000);
+  delay(40000);
 }
 
 

@@ -35,7 +35,7 @@ public:
   float dist;            // distance to waypoint
   float u;               // control effort
   float Kp= 10.0;         // proportional control gain
-  float Kr=1.0;          // right motor gain correction; change if motors are not running at same speed
+  float Kr=20.0;          // right motor gain correction; change if motors are not running at same speed
   float Kl=1.0;          // left motor gain correction; change if motors are not running at same speed
   float avgPower = 50.0; // average forward thrust, change to 50 from 10 per 4.5 instructions
   float uR = uR*Kr;              // right motor effort
