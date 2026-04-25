@@ -1,6 +1,5 @@
 %% Data values
-T = [10.7 11.6 12.6 14.3 15.3 16.6 18.5...
-19.8 20.6 21.2 22.1 23.2 24.5]; %INPUT DATA (in Kelvins)
+T = [13.4 15.1 16.6 17.2 23 22.3 21.3 20.5 18.2 19.5]; %INPUT DATA (in Kelvins)
 % if need to convert celcius to kelvin
 T = T + 273.15;
 V = [2.309 2.017 1.769 1.666 0.687 0.815 0.97 1.12 1.504 1.273]; %INPUT DATA
@@ -8,10 +7,10 @@ confLev = 0.95;
 
 %% Resitance Calculations
 % Define Variables
-Rp1 = 152157;
-Rg = 100000;
-Rf = 300000;
-Rn1 = 100000;
+Rp1 = 152930;
+Rg = 99400;
+Rf = 299400;
+Rn1 = 100400;
 
 V_plus = (Rg/(Rp1 + Rg)) * 5;
 Vin = (V - ((1 + Rf/Rn1) * V_plus)) * (-Rn1/Rf);
@@ -76,12 +75,12 @@ title('Steinhart-Hart Fit')
 
 %% Resistance to Temperature
 %Coefficients:
-a = 0.05423; 
-b = -0.01425; 
-c = 0.001308; 
-d = -3.932e-05; 
+a = 0.02431; 
+b = -0.005626; 
+c = 0.0004833; 
+d = -1.314e-05; 
 
 temp = @(R) 1/sym(a+b*log(R)+c*(log(R).^2)+d*(log(R).^3))
-for i = 1:length(res)
+for i = 1:length(t)
     temperatures(i) = temp(res(i))
 end

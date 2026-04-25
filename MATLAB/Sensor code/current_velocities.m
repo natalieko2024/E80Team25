@@ -1,7 +1,7 @@
 % From the GPS
-x_position = [];
-y_position = [];
-depth = [];
+x_position = x;
+y_position = y;
+%depth = depth;
 
 % Get Current Velocities
 u_vel = [];             % x-direction

@@ -1,32 +1,50 @@
 % From the GPS
-x_position = [];
-y_position = [];
+x_position = double(x); %- lon(1);
+y_position = double(y); %- lat(1);
 
 % Earth magentic field noise (might be fixed from calibration?)
-x_earth = 0;
-y_earth = 0;
-z_earth = 0;
+% x_earth = 0;
+% y_earth = 0;
+% z_earth = 0;
 
 % Magentic field measurements from sensor
-x_mag = [] - x_earth;
-y_mag = [] - y_earth;
-z_mag = [] - z_earth;
 
-mag = sqrt(x_mag.^2 + y_mag.^2 + z_mag.^2);
+x_mag = double(MMTmagX); %- x_earth;
+y_mag = double(MMTmagY); %- y_earth;
+z_mag = double(MMTmagZ); %- z_earth;
+mag = double(MMTmagTotal);
+
+% Help (testing)
+%{
+x_position = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4];
+y_position = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2];
+mag = [10, 12, 15, 11, 9, 13, 20, 35, 18, 10, 8, 11, 14, 10, 7];
+
+x_position = [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5];
+y_position = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3];
+mag        = [10, 12, 35, 11, 9,  8, ...   % hotspot near (2,0)
+              13, 11, 18, 10, 9,  7, ...
+              8,  10, 12, 11, 38, 9, ...   % hotspot near (4,2)
+              7,  9,  10, 8,  12, 6];
+%}
 
 % Transform 1D coordinates into 2D coordinate matrices (grid)
-num_grid = 200;
+num_grid = 100;
 % change min and max based on our values
-xi = linspace(0, 5, num_grid);
-yi = linspace(0, 5, num_grid);
+xi = linspace(min(x_position), max(x_position), num_grid);
+yi = linspace(min(y_position), max(y_position), num_grid);
 [Xi, Yi] = meshgrid(xi, yi);
 
+% Convert Double
+Xi = double(Xi);
+Yi = double(Yi);
+
 % Interpolate mag onto grid (predicts points where data isnt taken)
-Bi = griddata(x_position, y_position, mag, Xi, Yi, 'cubic');
+Zq = griddata(x_position, y_position, mag, Xi, Yi);
 
 % Contour Plot
 figure()
-contourf(Xi, Yi, Bi, 30);
+contourf(xi, yi, Zq, 30);
 colormap(jet);
 c = colorbar;
 c.Label.String = 'Magnetic Anomaly (µT)';
@@ -39,8 +57,20 @@ title('Magnetometer Measurement Points');
 scatter(x_position, y_position, 'w.')
 hold on;
 
+% Position stuff sanity check
+figure
+plot(x)
+
+figure
+plot(y)
+
+figure()
+plot(x,y)
+
+%{
 % Get Peaks
 threshold = mean(mag) + 2*std(mag);     % significantly different
 i = find(mag > threshold);
 plot(x_position(i), y_position(i), 'ro', 'MarkerSize', 20, 'LineWidth', 2);
 %legend('Measurement points', 'Object Located');
+%}
